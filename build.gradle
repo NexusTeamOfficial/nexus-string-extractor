@@ -1,0 +1,61 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
+}
+
+group = 'com.nexusteam.framework'
+version = '0.1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'info.picocli:picocli:4.7.5'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.5'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName.set('nexus-string-extractor')
+    archiveVersion.set('0.1.0')
+    archiveClassifier.set('')
+    manifest {
+        attributes(
+            'Main-Class': 'com.nexusteam.framework.xml.string.NexusStringExtractor',
+            'Implementation-Title': 'NexusStringExtractor',
+            'Implementation-Version': version
+        )
+    }
+    mergeServiceFiles()
+}
+
+jar {
+    enabled = true
+    archiveClassifier.set('lib')
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifactId = 'nexus-string-extractor'
+        }
+    }
+}
+
+build.dependsOn shadowJar
