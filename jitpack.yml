@@ -1,6 +1,7 @@
 jdk:
-  - openjdk11
+  - openjdk17
 before_install:
-  - sdk install java 11.0.22-tem || true
+  - git config --global --add safe.directory /build
+  - git config --global --add safe.directory '*'
 install:
-  - ./gradlew build publishToMavenLocal -x test
+  - gradle clean assemble publishToMavenLocal -x test
