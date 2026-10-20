@@ -1,6 +1,7 @@
 # NexusStringExtractor
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![JitPack](https://jitpack.io/v/NexusTeamOfficial/nexus-string-extractor.svg)](https://jitpack.io/#NexusTeamOfficial/nexus-string-extractor)
 [![Java](https://img.shields.io/badge/Java-11%2B-orange.svg)](#)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -8,6 +9,85 @@
 
 ```text
 android:text="Welcome to Nexus"  →  android:text="@string/welcome_to_nexus"
+```
+
+---
+
+## Gradle — `implementation` se download
+
+JitPack se seedha library add karo (koi Maven Central publish zaroori nahi).
+
+### 1) Root `settings.gradle` (ya `settings.gradle.kts`)
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }   // ← add this
+    }
+}
+```
+
+Agar purana project hai to **root** `build.gradle` me:
+
+```gradle
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+### 2) App / module `build.gradle`
+
+```gradle
+dependencies {
+    // Library API (StringExtractor.builder()…)
+    implementation 'com.github.NexusTeamOfficial:nexus-string-extractor:0.1.0'
+}
+```
+
+Tag ke baad version:
+
+| Version | Dependency |
+|---------|------------|
+| Latest commit | `com.github.NexusTeamOfficial:nexus-string-extractor:main-SNAPSHOT` |
+| Tag `0.1.0` / `v0.1.0` | `com.github.NexusTeamOfficial:nexus-string-extractor:0.1.0` |
+
+> Pehli baar JitPack build 1–2 minute le sakta hai. Status: [jitpack.io/#NexusTeamOfficial/nexus-string-extractor](https://jitpack.io/#NexusTeamOfficial/nexus-string-extractor)
+
+### 3) Code me use
+
+```java
+import com.nexusteam.framework.xml.string.StringExtractor;
+import com.nexusteam.framework.xml.string.model.TransformationResult;
+
+TransformationResult r = StringExtractor.builder()
+    .resDir("app/src/main/res")   // path to res/
+    .smartNames(true)
+    .backup(true)
+    .verbose(true)
+    .prefix("str_")              // optional
+    .build()
+    .extract();
+
+System.out.println("Extracted: " + r.getStringsExtracted());
+```
+
+**Note:** Ye **build-time** tool hai (Gradle task / desktop / utility app). Normal Android Activity me runtime UI ke liye mat chalao.
+
+### CLI JAR (manual download)
+
+```bash
+git clone https://github.com/NexusTeamOfficial/nexus-string-extractor.git
+cd nexus-string-extractor
+./gradlew shadowJar
+# → build/libs/nexus-string-extractor-0.1.0.jar
+
+java -jar build/libs/nexus-string-extractor-0.1.0.jar -i app/src/main/res --backup
 ```
 
 ---
@@ -25,26 +105,11 @@ android:text="Welcome to Nexus"  →  android:text="@string/welcome_to_nexus"
 | **Dry-run / backup** | Safe trial runs + `.bak` files |
 | **Resilient parse** | Bad layouts are skipped, not fatal |
 | **Android-safe XML** | No crash on missing Apache parser features |
-| **Library + CLI** | Use as JAR API or `java -jar` |
+| **Library + CLI** | `implementation` via JitPack or `java -jar` |
 
 ---
 
-## Quick start
-
-### Build
-
-```bash
-./gradlew shadowJar
-# → build/libs/nexus-string-extractor-0.1.0.jar
-```
-
-### CLI
-
-```bash
-java -jar build/libs/nexus-string-extractor-0.1.0.jar \
-  -i app/src/main/res \
-  --backup --verbose
-```
+## CLI options
 
 | Option | Description |
 |--------|-------------|
@@ -55,28 +120,8 @@ java -jar build/libs/nexus-string-extractor-0.1.0.jar \
 | `-v`, `--verbose` | Fine logs |
 | `--prefix` | Name prefix |
 | `--no-smart-names` | Force sequential `a`, `b`, `c`… |
-| `-h`, `--help` | Help |
-| `-V`, `--version` | Version |
 
 **Exit codes:** `0` success · `1` error · `2` bad args
-
-### Library API
-
-```java
-import com.nexusteam.framework.xml.string.StringExtractor;
-import com.nexusteam.framework.xml.string.model.TransformationResult;
-
-TransformationResult r = StringExtractor.builder()
-    .resDir("app/src/main/res")
-    .smartNames(true)
-    .backup(true)
-    .verbose(true)
-    .prefix("str_")
-    .build()
-    .extract();
-
-System.out.println(r.getStringsExtracted());
-```
 
 ---
 
@@ -105,27 +150,18 @@ System.out.println(r.getStringsExtracted());
 
 ---
 
-## Project layout
+## Tag release (JitPack ke liye)
 
-```text
-nexus-string-extractor/
-├── build.gradle
-├── settings.gradle
-├── README.md
-├── CHANGELOG.md
-├── LICENSE
-├── .github/workflows/ci.yml
-└── src/main/java/com/nexusteam/framework/xml/string/
-    ├── NexusStringExtractor.java
-    ├── StringExtractor.java
-    ├── cli/
-    ├── core/
-    ├── parser/
-    ├── generator/
-    ├── writer/
-    ├── model/
-    ├── util/
-    └── exception/
+GitHub pe **Releases → Create a new release**:
+
+1. Tag: `0.1.0` (ya `v0.1.0`)
+2. Title: `v0.1.0`
+3. Publish
+
+Uske baad:
+
+```gradle
+implementation 'com.github.NexusTeamOfficial:nexus-string-extractor:0.1.0'
 ```
 
 ---
@@ -133,9 +169,7 @@ nexus-string-extractor/
 ## Requirements
 
 - JDK 11+
-- Gradle 8.x (wrapper recommended)
-
----
+- Gradle 8.x
 
 ## License
 
